@@ -78,7 +78,6 @@ def rmse(y_true, y_pred):
 sol = solve_ivp(tank, t_span=t_span, t_eval=t_eval, y0=initial_state)
 X = sol.y.T
 
-# Held-out test trajectories for CV 
 testICs = [[4, 2]]#, [2, 4], [3, 1], [0.5, 4.5]] # Can add more CV ICs
 testTrajs = []
 for ic in testICs:
@@ -164,7 +163,7 @@ for alpha in alphaVals:
         entry["coeff_error"] = coeffErrA + coeffErrB
         print(f"Coefficient Error: {entry['coeff_error']}\n")
 
-        # Cross-validation: plain RMSE, averaged over the held-out ICs
+        # Cross-validation
         cv_errors = []
         for ic, testX in zip(testICs, testTrajs):
             try:
@@ -201,7 +200,7 @@ print(f"Best Coefficients have rank {r2_all.index(best_by_coeff_error['r2_total'
 
 print(f"\nBest Cross-Validation Error: {best_by_cv['cv_error']}")
 
-# ---------------- Top 10 by CV error (plain RMSE) ----------------
+# Top 10 by CV error
 top10 = sorted(finite_results, key=lambda r: r["cv_error"], reverse=True)[:10]
 
 print("\nTop 10 CV Errors:")
