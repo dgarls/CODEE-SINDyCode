@@ -35,10 +35,10 @@ X = data.y.T  # Unpacking the solution
 lib = ps.PolynomialLibrary(degree=2, include_bias=False)
 
 model = ps.SINDy(
-    feature_library=lib, optimizer=ps.STLSQ(threshold=1e-3), feature_names=["X"]
+    feature_library=lib, optimizer=ps.STLSQ(threshold=1e-3),
 )
 
-model.fit(x=X, t=t)
+model.fit(x=X, t=t, feature_names=["X"])
 
 model.print()  # Output: (X)' = 1.124 X + -0.039 X^2
 # This is very similar to what we found by hand!
