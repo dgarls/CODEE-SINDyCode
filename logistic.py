@@ -15,34 +15,36 @@ t = years - 1950  # years since 1950
 japan_data = df["Population"].values.reshape(-1, 1)
 
 # Step 3: Build SINDy model
-optimizer = ps.STLSQ(threshold=0.0)
+optimizer = ps.STLSQ(threshold=0.0, alpha=0, unbias=False)
 library = ps.PolynomialLibrary(degree=4, include_bias=False)
-model = ps.SINDy(feature_library=library, optimizer=optimizer, feature_names=["X"])
+model = ps.SINDy(feature_library=library, optimizer=optimizer)
 
 # Step 4: Fit using shifted time
-model.fit(japan_data, t=t)
+model.fit(japan_data, t=t, feature_names = ["X"])
 model.print()
 
 # Step 5: Simulate using same shifted time
 sim = model.simulate(x0=[japan_data[0, 0]], t=t)
 
-plt.figure()
+plt.figure(dpi=600)
 plt.plot(t, japan_data, "o", markersize=2, label="True Values")
 plt.ylabel("Population (Millions)")
 plt.xlabel("Years Since 1950")
 plt.grid(True)
 plt.tight_layout()
+plt.savefig("japanData.png")
 plt.show()
 
 # Step 6: Plot
-plt.figure()
+plt.figure(dpi=600)
 plt.plot(t, japan_data, "o", markersize=2, label="True Values")
-plt.plot(t, sim, "o-", markersize=2, label="SINDy Simulation")
+plt.plot(t, sim, "-", markersize=2, label="SINDy Simulation")
 plt.legend()
 plt.ylabel("Population (Millions)")
 plt.xlabel("Years Since 1950")
 plt.grid(True)
 plt.tight_layout()
+plt.savefig("logisticUntruncated.png")
 plt.show()
 
 # Calculate RMSE of the simulation to the real data
@@ -71,25 +73,26 @@ t_trunc = t[mask]
 data_trunc = japan_data[mask]
 
 # -------------------- Refit SINDy on truncated data --------------------
-model_trunc = ps.SINDy(
-    feature_library=library, optimizer=optimizer, feature_names=["X"]
-)
+model_trunc = ps.SINDy(feature_library=library, optimizer=optimizer)
 
-model_trunc.fit(data_trunc, t=t_trunc)
+
+model_trunc.fit(data_trunc, t=t_trunc, feature_names = ["X"])
 model_trunc.print()
+print(model_trunc.coefficients())
 
 # -------------------- Simulate --------------------
 sim_trunc = model_trunc.simulate(x0=[data_trunc[0, 0]], t=t_trunc)
 
 # -------------------- Plot --------------------
-plt.figure()
+plt.figure(dpi=600)
 plt.plot(t_trunc, data_trunc, "o", markersize=2, label="True (Truncated)")
-plt.plot(t_trunc, sim_trunc, "o-", markersize=2, label="SINDy (Truncated)")
+plt.plot(t_trunc, sim_trunc, "-", markersize=2, label="SINDy (Truncated)")
 plt.legend()
 plt.xlabel("Years Since 1950")
 plt.ylabel("Population (Millions)")
 plt.grid(True)
 plt.tight_layout()
+plt.savefig("logisticTruncated.png")
 plt.show()
 
 # -------------------- RMSE --------------------
